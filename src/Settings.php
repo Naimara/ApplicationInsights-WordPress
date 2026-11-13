@@ -60,7 +60,7 @@ class Settings {
         $this->options = get_option( 'applicationinsights_options' );
         ?>
             <div class="wrap">
-                <?php echo _e('Application Insights Settings', 'applicationinsights'); ?>           
+                <h2><?php esc_html_e( 'Application Insights Settings', 'applicationinsights' ); ?></h2>
                 <form method="post" action="options.php">
             <?php
                 // This prints out all hidden setting fields
@@ -82,7 +82,7 @@ class Settings {
             $this->options = get_site_option( 'applicationinsights_options' );
         ?>
             <div class="wrap">
-                <h2><?php echo _e('Application Insights Settings', 'applicationinsights'); ?></h2>
+                <h2><?php esc_html_e( 'Application Insights Settings', 'applicationinsights' ); ?></h2>
                 <form method="POST" action="edit.php?action=applicationinsights-setting-admin">
             <?php
                 // This prints out all hidden setting fields
@@ -96,10 +96,33 @@ class Settings {
     }
     
     public function pageInitialization()
-    {        
-        register_setting('applicationinsights_option_group', 'applicationinsights_options');
-        add_settings_section('main_section', 'Application Settings', null, 'applicationinsights-setting-admin');  
-        add_settings_field('instrumentation_key', 'Instrumentation Key', array( $this, 'instrumentationKeyCallback' ), 'applicationinsights-setting-admin', 'main_section');      
+    {
+        register_setting(
+            'applicationinsights_option_group',
+            'applicationinsights_options',
+            array(
+                'type'              => 'array',
+                'sanitize_callback' => array( $this, 'sanitizeOptions' ),
+            )
+        );
+        add_settings_section( 'main_section', 'Application Settings', '__return_false', 'applicationinsights-setting-admin' );
+        add_settings_field( 'instrumentation_key', 'Instrumentation Key', array( $this, 'instrumentationKeyCallback' ), 'applicationinsights-setting-admin', 'main_section' );
+    }
+
+    /**
+     * @param mixed $input
+     * @return array<string, string>
+     */
+    public function sanitizeOptions( $input ): array {
+        if ( ! is_array( $input ) ) {
+            return array();
+        }
+
+        return array(
+            'instrumentation_key' => isset( $input['instrumentation_key'] )
+                ? sanitize_text_field( $input['instrumentation_key'] )
+                : '',
+        );
     }
 
     public function instrumentationKeyCallback()
@@ -118,39 +141,33 @@ class Settings {
     * page.
     */
     
-    function applicationinsights_options() 
-    {
-        // Make sure we are posting from our options page. There's a little surprise
-        // here, on the options page we used the 'applicationinsights_option_group'
-        // slug when calling 'settings_fields' but we must add the '-options' postfix
-        // when we check the referer.
-        check_admin_referer('applicationinsights_option_group-options');
-        
-        // This is the list of registered options.
-        global $new_whitelist_options;
-        // pick option group
-        $options = $new_whitelist_options['applicationinsights_option_group'];
+    public function applicationinsights_options(): void {
+        check_admin_referer( 'applicationinsights_option_group-options' );
 
-        // Go through the posted data and save only our options. This is a generic
-        // way to do this, but you may want to address the saving of each option
-        // individually.
-        foreach ($options as $option) {           
-            if (isset($_POST[$option])) {
-                // If we registered a callback function to sanitizes the option's
-                // value it is where we call it (see register_setting).
-                $option_value = apply_filters('sanitize_option_' . 'applicationinsights_option_group', $_POST[$option]);
-                // And finally we save our option with the site's options.
-                update_site_option($option, $option_value);
+        global $new_allowed_options;
+        $options = $new_allowed_options['applicationinsights_option_group'] ?? array();
+
+        foreach ( $options as $option ) {
+            if ( isset( $_POST[ $option ] ) ) {
+                $option_value = apply_filters(
+                    'sanitize_option_' . $option,
+                    wp_unslash( $_POST[ $option ] )
+                );
+                update_site_option( $option, $option_value );
             } else {
-                // If the option is not here then delete it. It depends on how you
-                // want to manage your defaults however.
-                delete_site_option($option);
+                delete_site_option( $option );
             }
         }
-        
-        // At last we redirect back to our options page.
-        wp_redirect(add_query_arg(array('page' => 'applicationinsights-setting-admin',
-            'updated' => 'true'), network_admin_url('settings.php')));
+
+        wp_safe_redirect(
+            add_query_arg(
+                array(
+                    'page'    => 'applicationinsights-setting-admin',
+                    'updated' => 'true',
+                ),
+                network_admin_url( 'settings.php' )
+            )
+        );
         exit;
     }
 }

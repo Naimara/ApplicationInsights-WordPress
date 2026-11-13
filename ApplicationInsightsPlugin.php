@@ -1,13 +1,17 @@
 <?php
 /*
 Plugin Name: Application Insights
-Description: Integrates a WordPress site with Microsoft Application Insights.
-Version: 2.3
-Author: ApplicationInsights
-License:  MIT
+Plugin URI: https://github.com/Naimara/ApplicationInsights-WordPress
+Description: Unofficial Application Insights integration for WordPress. Maintainer: Naimara. Developer: Maximiliano Sorribas. Not affiliated with Microsoft.
+Version: 2.4
+Author: Naimara
+Author URI: https://github.com/Naimara
+License: MIT
+License URI: https://opensource.org/licenses/MIT
  */
 
-require_once 'vendor/autoload.php';
+//require_once 'vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 // Enables Admin configuration experience
 $mySettingsPage = new ApplicationInsights\WordPress\Settings();

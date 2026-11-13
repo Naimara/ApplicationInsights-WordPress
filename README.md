@@ -2,9 +2,30 @@
 
 Integrates a WordPress site with Azure Application Insights.
 
-Please refer to [README.txt](README.txt) for plugin information. See details on plugin readme authoring [here](https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/).
+## Maintainers and origin
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute.
+| Role | Name |
+|------|------|
+| **Organization / maintainer** | [Naimara](https://github.com/Naimara) |
+| **Developer** (2.4+) | Maximiliano Sorribas |
 
-# Status
-This SDK is NOT maintained or supported by Microsoft even though we've contributed to it in the past. Note that Azure Monitor only provides support when using the [supported SDKs](https://docs.microsoft.com/en-us/azure/azure-monitor/app/platforms#unsupported-community-sdks). We’re constantly assessing opportunities to expand our support for other languages, so follow our [GitHub Announcements](https://github.com/microsoft/ApplicationInsights-Announcements/issues) page to receive the latest SDK news.
+This is a **community fork** of the original [Microsoft AppInsights-WordPress](https://github.com/Microsoft/AppInsights-WordPress) plugin, which is no longer maintained upstream. Active repository: [github.com/Naimara/ApplicationInsights-WordPress](https://github.com/Naimara/ApplicationInsights-WordPress).
+
+This fork is **not affiliated with, endorsed by, or sponsored by Microsoft Corporation**. It sends telemetry to Application Insights using your own instrumentation key, as documented by Microsoft for the Azure service.
+
+## Copyright and license
+
+The software is licensed under the [MIT License](LICENSE).
+
+- **Original work:** Copyright (c) 2018 Microsoft Corporation.
+- **Fork and modifications from 2.4 onward:** Copyright (c) 2025-2026 Naimara.
+
+Distribution and modification must retain the copyright and permission notices in `LICENSE`, as required by MIT.
+
+**Trademarks:** Microsoft, Azure, and Application Insights are trademarks of Microsoft Corporation. All other trademarks are the property of their respective owners.
+
+## Version and runtime
+
+**Version 2.4** — requires **PHP 8.3** (tested with 8.3.36). Run `composer install --no-security-blocking` so dependencies and the SDK patch are applied; include the `vendor/` directory when deploying without Composer on the server.
+
+Plugin details and changelog: [README.txt](README.txt). Contributing: [CONTRIBUTING.md](CONTRIBUTING.md).

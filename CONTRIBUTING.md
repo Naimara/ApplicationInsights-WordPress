@@ -1,10 +1,16 @@
 # How to Contribute
 
-If you're interested in contributing, take a look at the general [contributor's guide](https://github.com/Microsoft/ApplicationInsights-Home/blob/master/CONTRIBUTING.md) first.
+This repository is a **Naimara** fork of the abandoned [Microsoft AppInsights-WordPress](https://github.com/Microsoft/AppInsights-WordPress) plugin. Maintained by Naimara; primary development from 2.4 onward by Maximiliano Sorribas. Source and issues: [github.com/Naimara/ApplicationInsights-WordPress](https://github.com/Naimara/ApplicationInsights-WordPress). Contributions are welcome.
+
+## Copyright and licensing
+
+By contributing, you agree that your contributions are licensed under the same [MIT License](LICENSE) as this project. Do not remove the existing copyright notices for Microsoft Corporation or Naimara from `LICENSE` or shipped copies. Substantial changes should remain compatible with the fork notice in `README.txt` (unofficial plugin, not affiliated with Microsoft).
+
+For background on Application Insights SDKs, see the general [Application Insights contributor's guide](https://github.com/Microsoft/ApplicationInsights-Home/blob/master/CONTRIBUTING.md).
 
 ## Build and Test locally
 
-1. Run `composer install` to install all dependencies.
+1. Run `composer install --no-security-blocking` to install dependencies. Target runtime is **PHP 8.3.36** (`composer` enforces `~8.3.36` and resolves against platform `8.3.36`).
 2. Change to docker directory: `cd docker`
 3. Run `docker-compose up -d`. This step assumes you have docker installed and configured.
 4. Configure WordPress and Application Insights plugin at http://localhost:8000
@@ -49,15 +55,12 @@ See instructions here: https://developer.wordpress.org/plugins/wordpress-org/how
 ```
 svn co https://plugins.svn.wordpress.org/application-insights application-insights
 cd application-insights/
-rm -rf trunk/
-mkdir trunk
-cp -r ../../wordpress/ trunk/
+rsync -r -a --delete -v ../../wordpress/ trunk
 cd trunk/
-rm -rf .gitignore 
-rm -rf .gitattributes
-rm -rf .git
-svn add trunk/*
-svn ci -m "updated to the latest version" --username ApplicationInsights --password ""
+svn cleanup .
+svn update
+svn status
+svn ci -m "updated to the latest version" --username naimara --password ""
 ```
 
 ## Contributing

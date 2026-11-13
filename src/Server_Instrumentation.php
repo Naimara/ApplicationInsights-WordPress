@@ -1,4 +1,5 @@
 <?php
+
 namespace ApplicationInsights\WordPress;
 
 /**
@@ -6,50 +7,61 @@ namespace ApplicationInsights\WordPress;
  */
 class Server_Instrumentation
 {
-    private $_telemetryClient;
+    private ?\ApplicationInsights\Telemetry_Client $_telemetryClient = null;
 
     public function __construct()
     {
-         /* Necessary check for multi-site installation */
-        if ( ! function_exists( 'is_plugin_active_for_network' ) ) {
-            require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
-        }   
-        if ( is_multisite() && is_plugin_active_for_network("application-insights/ApplicationInsightsPlugin.php") ) 
-        {
-            $application_insights_options = get_site_option("applicationinsights_options");
-        } else {
-            $application_insights_options = get_option("applicationinsights_options");
-        } 
+        $instrumentationKey = Common::getInstrumentationKey();
+        if ( $instrumentationKey === '' ) {
+            return;
+        }
+
         $this->_telemetryClient = new \ApplicationInsights\Telemetry_Client();
-        $this->_telemetryClient->getContext()->setInstrumentationKey($application_insights_options["instrumentation_key"]);
+        $this->_telemetryClient->getContext()->setInstrumentationKey( $instrumentationKey );
         $sdkVer = $this->_telemetryClient->getContext()->getInternalContext()->getSdkVersion();
-        $this->_telemetryClient->getContext()->getInternalContext()->setSdkVersion('wp_' . $sdkVer);
+        $this->_telemetryClient->getContext()->getInternalContext()->setSdkVersion( 'wp_' . $sdkVer );
 
-        set_exception_handler(array($this, 'exceptionHandler'));
+        set_exception_handler( array( $this, 'exceptionHandler' ) );
     }
 
-    function endRequest()
+    public function endRequest(): void
     {
-        if (is_page() || is_single() || is_category() || is_home() || is_archive() || is_404())
-        {
-            $url = $_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
+        if ( $this->_telemetryClient === null ) {
+            return;
+        }
+
+        if ( is_page() || is_single() || is_category() || is_home() || is_archive() || is_404() ) {
+            $host = isset( $_SERVER['HTTP_HOST'] ) ? (string) $_SERVER['HTTP_HOST'] : '';
+            $uri = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '';
+            $url = $host . $uri;
             $requestName = Common::getPageTitle();
-            $startTime = $_SERVER["REQUEST_TIME"];
-            $duration = floatval(timer_stop(0, 3)) * 1000;
-            $this->_telemetryClient->trackRequest($requestName, $url, $startTime, $duration, http_response_code(), !is_404());
+            $startTime = isset( $_SERVER['REQUEST_TIME'] ) ? (int) $_SERVER['REQUEST_TIME'] : time();
+            $duration = (float) timer_stop( 0, 3 ) * 1000;
+            $statusCode = http_response_code();
+            if ( $statusCode === false ) {
+                $statusCode = 200;
+            }
 
-            // Flush all telemetry items
+            $this->_telemetryClient->trackRequest(
+                $requestName,
+                $url,
+                $startTime,
+                $duration,
+                $statusCode,
+                ! is_404()
+            );
+
             $this->_telemetryClient->flush();
         }
     }
 
-
-    function exceptionHandler(\Exception $exception)
+    public function exceptionHandler( \Throwable $exception ): void
     {
-        if ($exception != NULL)
-        {
-            $this->_telemetryClient->trackException($exception);
-            $this->_telemetryClient->flush();
+        if ( $this->_telemetryClient === null ) {
+            return;
         }
+
+        $this->_telemetryClient->trackException( $exception );
+        $this->_telemetryClient->flush();
     }
 }

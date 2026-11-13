@@ -1,12 +1,27 @@
 {
     "require": {
-        "php": ">=5.4.2",
-        "microsoft/application-insights": ">=0.4.3"
+        "php": "~8.3.36",
+        "microsoft/application-insights": "^0.4.5"
+    },
+
+    "config": {
+        "platform": {
+            "php": "8.3.36"
+        }
     },
 
     "autoload": {
         "psr-4": {
             "ApplicationInsights\\WordPress\\": "src/"
         }
+    },
+
+    "scripts": {
+        "post-install-cmd": [
+            "@php scripts/patch-application-insights-sdk.php"
+        ],
+        "post-update-cmd": [
+            "@php scripts/patch-application-insights-sdk.php"
+        ]
     }
 }
