@@ -2,10 +2,10 @@
 
 Contributors: ApplicationInsights
 Tags: Application Insights, monitoring, tracing, telemetry 
-Stable Tag: trunk
-Requires at least: 3.0.1
+Stable Tag: 2.4
+Requires at least: 5.9
 Requires PHP: 8.3
-Tested up to: 4.9.6
+Tested up to: 6.8
 License: MIT
 License URI: http://opensource.org/licenses/MIT
 
@@ -19,13 +19,23 @@ Active development is done on [GitHub](https://github.com/Microsoft/AppInsights-
 
 Other SDKs and documentation can be found [here](https://github.com/Microsoft/AppInsights-Home).
 
+This release requires PHP 8.3. Deploy the `vendor/` directory with the plugin, or run `composer install --no-security-blocking` in the plugin folder after upload.
+
 == Installation ==
 
-1. Upload all files to the '/wp-content/plugins/' directory.
+1. Upload all files (including `vendor/`) to the `/wp-content/plugins/application-insights/` directory, or upload from git and run `composer install --no-security-blocking` on the server.
 2. Activate the plugin through the 'Plugins' menu in WordPress.
 3. Go to Settings -> Application Insights and enter the Instrumentation Key you received from http://portal.azure.com. Use direct link https://ms.portal.azure.com/#create/Microsoft.AppInsights to create a new Application Insights resource.
 
 == Changelog ==
+
+= 2.4 =
+* Requires PHP 8.3; PHP 7.x is no longer supported.
+* Removed PHP 8.2+ deprecation warnings when sending server-side telemetry (Composer patch for deprecated `utf8_encode` in the Application Insights PHP SDK).
+* Updated admin and network settings for current WordPress APIs (`$new_allowed_options`, option sanitization, safer redirects and output escaping).
+* Fixed multisite network option save sanitization (`sanitize_option_{$option}`).
+* Skip client and server instrumentation when no instrumentation key is configured.
+* Hardened request telemetry against missing `$_SERVER` values and undefined options.
 
 = 2.3 =
 * Added support for Wordpress Multisite Network.

@@ -2,6 +2,6 @@
 
 Integrates a WordPress site with Azure Application Insights.
 
-Please refer to [README.txt](README.txt) for plugin information. See details on plugin readme authoring [here](https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/).
+**Version 2.4** — requires **PHP 8.3** (tested with 8.3.36). Run `composer install --no-security-blocking` so dependencies and the SDK patch are applied; include the `vendor/` directory when deploying without Composer on the server.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute.
+Please refer to [readme.txt](readme.txt) for plugin information and the full changelog. See [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute.
