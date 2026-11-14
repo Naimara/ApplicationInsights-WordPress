@@ -12,10 +12,29 @@ For background on Application Insights SDKs, see the general [Application Insigh
 
 1. Run `composer install --no-security-blocking` to install dependencies. Target runtime is **PHP 8.3.36** (`composer` enforces `~8.3.36` and resolves against platform `8.3.36`).
 2. Change to docker directory: `cd docker`
-3. Run `docker-compose up -d`. This step assumes you have docker installed and configured.
+3. Run `docker compose up -d` (or `docker-compose up -d`). This step assumes you have Docker installed and configured.
 4. Configure WordPress and Application Insights plugin at http://localhost:8000
     a. Activate the plugin through the 'Plugins' menu in WordPress.
     b. Go to Settings -> Application Insights and enter the Instrumentation Key you received from http://portal.azure.com. Use direct link https://ms.portal.azure.com/#create/Microsoft.AppInsights to create a new Application Insights resource
+
+### Local Docker stack (`docker/docker-compose.yml`)
+
+| Service    | Image                    |
+|------------|--------------------------|
+| Database   | `mysql:8.0`              |
+| WordPress  | `wordpress:php8.3-apache` |
+
+MySQL 8.0 aligns with current WordPress requirements and is closer to common production setups (for example Azure Database for MySQL 8.x).
+
+If you **previously** ran this compose file with **MySQL 5.7** and the `db_data` volume already exists, MySQL 8.0 may fail to start on that old data. In that case only, reset the local database volume and bring the stack up again:
+
+```bash
+cd docker
+docker compose down --volumes
+docker compose up -d
+```
+
+That wipes the local WordPress database; you will go through the WordPress install wizard again. A fresh clone that never used the old MySQL 5.7 image does not need this step.
 
 ## Development alongside the PHP SDK
 
@@ -42,9 +61,9 @@ Please include changelog update with every pull request. Changelog is tracked in
 
 ## Shutdown and cleanup
 
-The command `docker-compose down` removes the containers and default network, but preserves your WordPress database.
+The command `docker compose down` removes the containers and default network, but preserves your WordPress database (`db_data` volume).
 
-The command `docker-compose down --volumes` removes the containers, default network, and the WordPress database.
+The command `docker compose down --volumes` removes the containers, default network, and the WordPress database volume.
 
 ## How to release a new version
 
